@@ -1,0 +1,49 @@
+README		
+	This file, describing the contents of our submission, 
+as well as how to run the code.
+
+fuse.c, fuse.h
+	Fuse files.
+
+aofs.c
+	This is the main file of our f ilesystem. It contains 
+the code for the filesystem functions to be overwritten.
+	*You will need to change the macro "aofs_path" to reflect
+your working path
+	Compile with "make"
+
+benchmark.c
+	This is the benchmark program code.
+	Compile with "make benchamrk"
+	Run with "./benchmark"
+
+init_FS_FILE.c
+	This is the code for the program which initializes
+the space that our filesystem occupies.
+	*You will need to change the macro "aofs_path" to reflect
+your working path
+	Compile with "make init"
+	Run with "./init"
+
+mnt
+	This is a directory to be created by you, in this directory. 
+This directory will be used for benchamrking purposes and it 
+will be the directory you mount the filesystem to.
+
+FS_FILE
+	This is the file created by init_FS_FILE.c. This file 
+contains the contents of our filesystem.
+
+Running Our File System:
+	0) You may need root access "su root"
+	1) Update the macro "aofs_path" in both aofs.c and init_FS_FILE.c
+	2) Make the directory mnt: "mkdir mnt"
+	3) Compile init_FS_FILE and run it
+	4) make aofs.c with "make"
+	5) mount the filesystem on mnt: "./aofs mnt"
+	6) grab another terminal and you will be able to use our 
+filesystem in the mounted directory.
+	7) "umount" mnt will unmount the directory.
+
+Running the Benchmark:
+	See the insctuction in our Design Doc/Benchamrk Report

@@ -1,0 +1,30 @@
+1. Basic information
+Team number: 12
+Student ID of submitter: 1511087 (jrunnber)
+Student Name of submitter: John Runnberg
+Other Team Members: David Otwell (dotwell)
+
+
+2. Internal Record Format
+- Show your record format design and describe how your design satisfies O(1) field access. If not, just mention that you haven't implemented this feature.
+- Describe how you store a VarChar field.
+
+A record is stored as null bytes followed by the local offset to the end of every non null field in order, folloed by the contents of every non null field in order.
+For varchar we store only the chars (no length). Length is obtained by comparerd the offsets 
+
+
+3. Page Format
+- Show your page format design
+We used the page format showed in class on slide 17 Lecture 3. The records are placed starting from the beginning of the page and packed tightly.
+At the end of the page we store the offset to the free space (after records), number of slots, and the slots directory -- respectively from right to left.
+
+
+4. Implementation Detail
+- Other implementation details goes here.
+We tend to keep track of offsets in bytes
+
+
+5. Other (optional)
+- Freely use this section to tell us about other things related to the project 1 (optional)
+
+

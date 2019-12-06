@@ -1,0 +1,65 @@
+README       
+	File describing the contents and how to run the code.
+
+kern_switch.c
+	Source file where the lottery choosing portion of the queue resides.
+
+runq.h         
+	Modified header to include a function prototype of our lottery function.
+
+sched_ule.c  
+	Souce file modified to intercept timeshare queue.
+
+makefile
+	make file used for compiling the stress test.
+
+benchmark.c
+	Source file for the program used by stress test.
+
+stress.c
+	Source file for stressing the system.
+
+sampledata.csv
+	sample data from the kernel in log output mode. Contains over 30000 lottery events
+	for 90 different threads. 
+
+BenchmarkAnalysis.m
+	MatLab script used to interpret and anaylze data being logged from the kernel in log output mode.
+
+design_doc.pdf
+	Design document that details how the assignment was done.
+
+
+
+Compile the Kernel:
+	Copy sched_ule.c and kern_switch.c into src/sys/kern replacing the files already there. And do the same, copying runq.h into src/sys/sys.
+	Next navigate to the source directory and make a copy of GENERIC called MYKERNEL. 
+Now type: 
+
+	"make buildkernel KERNCONF=MYKERNEL -DKERNFAST"
+
+let that compile and once finished type:
+
+	"make installkernel KERNCONF=MYKERNEL"
+
+once this is finished reboot the system and you will be running the lottery algorithm.
+
+NOTE: There are two mode that the kernel can run in. The default mode produces kernel outputs on every add and removal of the lottery queue. 
+This data is formatted so a user can clearly identify what is going on. The other mode is logging output, this can be set by defining a macro called LOG_OUTPUT in kern_switch.c. 
+The logging output mode will only print removed events to the kernel and the data is seperated in a CSV format. 
+[process,tickets_held, minimum amount of tickets held by a process, maximum amount of tickets held by a process, total tickets held]
+
+Running the benchmark:
+	1. Recompile kernel to LOG_OUTPUT mode
+	2. Restart system in LOG_OUTPUT mode
+	3. Go into benchmark directory
+	4. run make
+	5. run "stress" under sudo
+	6. Wait, stress will run for 4 minutes
+	7. run csv output through MatLab scipt
+
+	Running the benchmark will produce a file called data.csv. By default the MatLab code is set to analyze data from the sampledata.csv file.
+	To run an analysis on the new benchmark data the file name in csvread() function in the matlab script will need to be changed to match data.csv.
+	Running the MatLab script should produce 3 separate graphs these graphs show, measured probability, calculated probability, and the amount of tickets
+	each processes has gathered. The stress program produced by the make file has the option for a single parameter, this parameter determines how many forked
+	threads are ran, if no parameter is set, the program runs 100 threads as default.

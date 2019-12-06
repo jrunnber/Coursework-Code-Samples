@@ -1,0 +1,81 @@
+1. Basic information
+Team Number : 12
+Student ID# of Submitter: 1511087 (jrunnber)
+Name of Submitter: John Runnberg
+ID#s and Names for others on the Team: 1545233 (dotwell) David Otwell
+
+
+2. Metadata
+- Show your metadata design (Tables and Columns table) and information about each column.
+
+	Our metadata is stored in two files, one for the Tables table and the other for the Columns table. We store information in them in the format specified in the
+		project report, namely we create record descriptors for the indicated fomats then use those descriptors to insert into the tables.
+	In order to retrieve a tables record desriptor based on its name, we do a scan through the Tables table to find the record with the corresponding name,
+		we then take the table-id given in that record and use that as the search criteria for a scan of the Columns table.
+		We then take every record that matches the table id and create an attribute based off of the fields, column-name, column-type, and column-length.
+		Lastly we construct a record descriptor based on the found attributes.
+
+
+3. Internal Record Format
+- Show your record format design and describe how your design satisfies O(1) field access. If not, just mention that your team hasn't implemented this feature.
+- Describe how you store a VarChar field.
+- Describe how you deal with an update and delete.
+
+	The record format comes from the given solution to project 1, which is layed out as follows:
+	Number of Data Fields -> Null Bytes -> Local Offsets Pointing to the End of Each Data Field -> The Data Fields
+	This satisfies O(1) access because you can always scan just the first three sections, then use the apprpiate offset to jump to the wanted data.
+	For VarChars, we don't need to store the length since we can find it by comparing the offsets to its end and its beggining.
+	We deal with deletions by simply overwriting the record with what needs to be compacted, or in the case that there is nothing next to it, we overwrite with empty space.
+	We deal with updates by overwriting the dat the same way as delete, but we then reinsert the new data, or move it to a different page.
+
+
+4. Page Format
+- Show your page format design.
+- Describe how you deal with an update and delete.
+
+	The page format comes from the given solution to project 1, which is layed out as follows:
+	SlotDirectorHeader (containing the number of slots and the offset to free space) ->  SlotDirectories for Each Record (containing the length of the record and the offset to the record) ->
+		Free Space -> Record Data
+	For deletions, we overwrite the data by sliding all of the data between it and the end of the slot directory over by the length of the record.
+		We then set the length and offset in the directory to be 0.
+	For updates, we use the same sliding technique, then we insert the new data into the page, or we move it to another page. In the case that it stays on the same page, 
+		we update the slot directory to reflect the new length and offset, if it instead moved pages we change the slot directory to be a tombstone as decribed in 6.
+
+
+5. File Format
+- Show your file format design.
+
+	As described in the assignment, each file corresponds to a single table and is made up of pages.
+	The pages are as described above and we only create another page in the file if there are no pages with enough free space to store a given record.
+
+
+6. Implementation Detail
+- Other implementation details goes here.  For example:  
+- Describe your use of Forwarding Addresses, including what happens when a Forwarding Address needs to be forwarded to yet another page.
+- Describe how a scan is done, touching each record once even when there are Forwarding Addresses.
+- Describe how you determine that a previously slot on a page is empty (after record is deleted), so that the slot can be re-used for another record.  (Yes, a record's rid is supposed to be permanent, but only while the record exists.)
+
+	We handle forwarding addresses by changing the record entry that is pointed at by the RID. We change it so that the length to be the new slotNum * (-1),
+		and the offset to be the new pageNum * (-1). This way if we see these values as negative when we go to read an RID, we will instead read the RID specified by the record entry.
+	We handle forwarding further times by deleting the record from the forwarded page and inserting it into the file wherever it fits,
+		we then edit the original tombstone to point to the new RID.
+
+	Scanning:
+		A scan will go through the table checking records in the order they are in the file. We do this by checking every slot on 
+		every page. If the slot has a 0 length and 0 offset it is empty and can be skipped. If the slot contains a negative offset and negative 
+		length it is a tombstone pointing to another page and can be ignored. The scan will read the record when it actually gets to that
+		page to aviod duplication. Other than those to cases records will be looked at based on the Comparative operator and values. This 
+		enusres that every record gets looked at exactly once. 
+	Ending the scan:
+		The scan looks at the total slots per page on its current page and compares against the current slot. When the slot is the last on
+		the page it will get a new page and the first slot on that page. The scan will also check, whenever getting a new page, if that page
+		is the last page of the file. In the case that it is, it will return the end of scan value.
+
+	We determine a slot is empty if its length and offset are both set to zero. If it is empty we will use it for the next insert on that page, and we will skip over it during scans.
+
+	Note:
+		We used the algorithms described but have some minor implementation errors which can/do cause problems with certain tests and valgrind.
+
+
+7. Other (optional)
+- Freely use this section to tell us about things that are related to the project 2, but not related to the other sections, such as design and implementation information for Advanced Features, if you've implemented them (optional).

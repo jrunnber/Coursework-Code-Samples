@@ -1,0 +1,57 @@
+1. Basic information
+Team number (e.g., 01) : 12
+#1 Student ID : jrunnber (1511087)
+#1 Student Name : John Runnberg
+#2 Student ID : dotwell (1545233)
+#2 Student Name : David Otwell
+OS (bit) :
+gcc version :
+
+
+2. Meta-data page in an index file
+- Show your meta-data page of an index design if you have any. 
+	We do not have a metadata page for our files.
+
+3. Index Entry Format
+- Show your index entry design (structure). 
+	On an internal page, the index entry is just the key, preceded by a pointer to the page that has values less than it.
+	On a leaf page the entries are split:
+		At the top of the page are slots that contain a key, a number of RIDs associated with the key, and an offset to whee the RIDs are stored.
+			These slots are in sorted order by key.
+		Started from the bottom we store the RIDS, clumped together by key, but otherwise unsorted
+
+4. Page Format
+- Show your internal-page (non-leaf node) design.
+	Our internal pages are simple, they start with a header that contains contains the number of traffic cops, the offset to free space, 
+		and a boolean that tells us if they are the directly above the leaf pages.
+	Following this is sets of page pointers and traffic cops, when searching, if the value is less than a traffic cop, then we go to the page at the previous pointer.
+	Lastly comes another page pointer whixh we go to if a value ios greater than all of the traffic cops.
+
+- Show your leaf-page (leaf node) design.
+	Our leaf page starts with a header that contains the offset to free space, the number of record, and page pointers to the previous and next pages.
+	Following this is a number of slot offsets equal to the number of records, each points to the end of a slot for ease of access.
+	Next comes a number of slots equal to the number of records, each of these contain a key, a number of RIDs associted with the key, and an offset to the start of the RIDs.
+		The slots and offsets are always in order
+	Then from the bottom of the page we have RIDs, each RID is always grouped with other RIDs that have the same key, but are otherwise unordered.
+
+5. Implementation Detail
+- Have you added your own source file (.cc or .h)?
+	No we only used provided files.
+
+- Have you implemented non-lazy deletion? Choose Yes or No: 
+	No, we implemented lazy delete.
+
+- Have you implemented duplicated key handling that can span multiple pages? Choose Yes or No: 
+  If yes, please explain briefly how you have implemented this feature.
+  	No.
+
+- Other implementation details:
+	As a note, we used the provided assignment 2 code, rather than our own.
+
+
+6. Other (optional)
+- Freely use this section to tell us about things that are related to the project 3, but not related to the other sections (optional)
+	We failed to implement varChars properly, so many functions will work for ints and floats, but not for varChars.
+	We also believe that while our split leaf function works properly, our implementation of spliting interior pages failed and we were never able to get it working.
+	The public test cases that we were able to pass are 1-10, 12, 15.
+

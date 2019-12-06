@@ -1,0 +1,61 @@
+README       
+	File describing the contents and how to run the code.
+
+vm_pageout.c
+	Source file where the FIFO queue is managed and main paging code resides.
+
+vm_page.h         
+	Modified header to include a timestamp for pages.
+
+vm_page.c  
+	Souce file modified to include a timestamp on pages and redirect all pages to be added into FIFO queue.
+
+makefile
+	make file used for compiling the stress test.
+
+benchmark.c
+	Source file for the program used by stress test.
+	*Note* the macro, TOTAL_RAM, should be changed to the amount of ram your virtual machines has.
+
+stress.c
+	Source file for stressing the system.
+
+sampledata.csv
+	Sample data from log_data mode. Contains queue stats from running our benchmark.
+
+BenchmarkAnalysis.m
+	MatLab script used to interpret and anaylze data being logged from the kernel in log data mode.
+
+design_doc.pdf
+	Design document that details how the assignment was done.
+
+
+
+Compile the Kernel:
+	Copy vm_pageout.c, page.h, and page.c into /src/sys/vm replacing the files already there. 
+	Next navigate to the source directory /src/sys and make a copy of GENERIC called MYKERNEL. 
+Now type: 
+
+	"make buildkernel KERNCONF=MYKERNEL"
+
+let that compile and once finished type:
+
+	"make installkernel KERNCONF=MYKERNEL"
+
+once this is finished reboot the system and you will be running the FIFO paging algorithm.
+
+NOTE: There are two mode that the kernel can run in. The deafualt mode produces
+data that is formatted so a user can clearly identify what is going on. The other mode is logging output, this can be set by defining a macro called LOG_DATA in vm_pageout.c. 
+The logging output mode will print data that is seperated in a CSV format. 
+
+Running the benchmark:
+	1. Go into benchmark directory
+	2. run make
+	3. run "stress"
+	4. Wait, stress will run for around 3 minutes
+	5. run csv output through MatLab script
+
+	Running the benchmark will produce a file called data.csv. By default the MatLab code is set to analyze data from the sampledata.csv file.
+	To run an analysis on the new benchmark data the file name in csvread() function in the matlab script will need to be changed to match data.csv.
+	Running the MatLab script should produce 3 separate graphs these graphs show changes in, queue size, head of the queue, tail of the queue
+	
